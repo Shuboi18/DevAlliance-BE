@@ -17,6 +17,9 @@ app.use(
   cors({
     credentials: true,
     origin: (origin, callback) => {
+      console.log("CORS Origin:", origin);
+
+      // Allow server-to-server, curl, postman
       if (!origin) return callback(null, true);
 
       const allowedOrigins = [
@@ -30,10 +33,14 @@ app.use(
         return callback(null, true);
       }
 
-      callback(new Error("Not allowed by CORS"));
+      // DO NOT throw error – just reject silently
+      return callback(null, false);
     },
   }),
 );
+
+// Explicitly handle preflight
+app.options("*", cors());
 
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
