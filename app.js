@@ -14,45 +14,22 @@ const profileRouter = require("./Routers/profileRouter");
 const connectRouter = require("./Routers/connectRouter");
 
 // --- CORS CONFIGURATION START ---
-const isOriginAllowed = (origin) => {
-  const allowedOrigins = [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://3.106.248.229",
-  ];
-
-  if (!origin) return true; // Allow Postman, curl, server-to-server
-
-  // Check strict match
-  if (allowedOrigins.includes(origin)) return true;
-
-  // Check startsWith for dynamic subpaths or minor variations
-  return (
-    origin.startsWith("http://localhost") ||
-    origin.startsWith("http://127.0.0.1") ||
-    origin.startsWith("http://192.168.") ||
-    origin.startsWith("http://10.") ||
-    origin.startsWith("http://172.") ||
-    origin.startsWith("http://3.106.248.229")
-  );
-};
-
+// Simplify to allow dynamic origins with credentials
 const corsOptions = {
+  origin: true, // Reflects the request origin, allowing all origins dynamically
   credentials: true,
-  origin: (origin, callback) => {
-    if (isOriginAllowed(origin)) {
-      callback(null, true);
-    } else {
-      console.error(`Blocked CORS Origin: ${origin}`);
-      // Using null, false prevents the 500 error and just fails the CORS check
-      callback(null, false);
-    }
-  },
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
 };
 
 app.use(cors(corsOptions));
+const server = require("http").createServer(app);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: true, // Allow all origins for Socket.io as well
+    credentials: true,
+  },
+});
+
 app.options("*", cors(corsOptions));
 // --- CORS CONFIGURATION END ---
 
@@ -65,20 +42,6 @@ app.use("/", profileRouter);
 app.use("/", connectRouter);
 const chatRouter = require("./Routers/chatRouter");
 app.use("/", chatRouter);
-
-const server = require("http").createServer(app);
-const io = require("socket.io")(server, {
-  cors: {
-    origin: (origin, callback) => {
-      if (isOriginAllowed(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  },
-});
 
 const Chat = require("./Models/chatSchema");
 
