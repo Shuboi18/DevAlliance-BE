@@ -13,30 +13,42 @@ const userRouter = require("./Routers/userRouter");
 const profileRouter = require("./Routers/profileRouter");
 const connectRouter = require("./Routers/connectRouter");
 app.use(cp());
+const isOriginAllowed = (origin) => {
+  const allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://3.106.248.229",
+  ];
+
+  if (!origin) return true; // Allow Postman, curl, server-to-server
+
+  // Check strict match
+  if (allowedOrigins.includes(origin)) return true;
+
+  // Check startsWith for dynamic subpaths or minor variations
+  return (
+    origin.startsWith("http://localhost") ||
+    origin.startsWith("http://127.0.0.1") ||
+    origin.startsWith("http://192.168.") ||
+    origin.startsWith("http://10.") ||
+    origin.startsWith("http://172.") ||
+    origin.startsWith("http://3.106.248.229")
+  );
+};
+
 app.use(
   cors({
     credentials: true,
     origin: (origin, callback) => {
-      console.log("CORS Origin:", origin);
-
-      // Allow server-to-server, curl, postman
-      if (!origin) return callback(null, true);
-
-      const allowedOrigins = [
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://3.106.248.229",
-      ];
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
+      if (isOriginAllowed(origin)) {
+        callback(null, true);
+      } else {
+        console.log("Blocked CORS Origin:", origin);
+        callback(new Error("Not allowed by CORS"));
       }
-
-      // DO NOT throw error – just reject silently
-      return callback(null, false);
     },
-  }),
+  })
 );
 
 // Explicitly handle preflight
@@ -55,15 +67,7 @@ const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
   cors: {
     origin: (origin, callback) => {
-      const allowed =
-        !origin ||
-        origin.startsWith("http://localhost") ||
-        origin.startsWith("http://127.0.0.1") ||
-        origin.startsWith("http://192.168.") ||
-        origin.startsWith("http://10.") ||
-        origin.startsWith("http://172.") ||
-        origin.startsWith("http://3.106.248.229/");
-      if (allowed) {
+      if (isOriginAllowed(origin)) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
