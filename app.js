@@ -29,7 +29,7 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "device-remember-token", "Access-Control-Allow-Origin", "Origin", "Accept"],
 };
 
-app.use(cors());
+app.use(cors(corsOptions));
 // --- CORS CONFIGURATION END ---
 
 // Health Check Route
