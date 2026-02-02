@@ -13,38 +13,31 @@ const userRouter = require("./Routers/userRouter");
 const profileRouter = require("./Routers/profileRouter");
 const connectRouter = require("./Routers/connectRouter");
 
-// --- MANUALLY REFLECT CORS HEADERS TO ALLOW ALL HOSTS ---
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
+// --- CORS CONFIGURATION START ---
+// Use standard cors package with origin: true (reflects request origin)
+const corsOptions = {
+  origin: true,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "device-remember-token", "Access-Control-Allow-Origin", "Origin", "Accept"],
+};
 
-  // Dynamically set the Access-Control-Allow-Origin header to the request's Origin
-  if (origin) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  } else {
-    // For non-browser requests (Postman, etc), generally safe to allow
-    res.setHeader("Access-Control-Allow-Origin", "*");
-  }
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+// --- CORS CONFIGURATION END ---
 
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, device-remember-token, Access-Control-Allow-Origin");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-
-  // Respond OK to preflight OPTIONS requests immediately
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-
-  next();
+// Health Check Route
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", message: "Server is running and CORS is active" });
 });
 
 const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
   cors: {
-    origin: true, // Socket.io handles this internally to allow all
+    origin: true, // Allow all origins for Socket.io
     credentials: true,
   },
 });
-// --- END CORS CONFIGURATION ---
 
 app.use(cp());
 app.use(express.json());
@@ -55,6 +48,16 @@ app.use("/", profileRouter);
 app.use("/", connectRouter);
 const chatRouter = require("./Routers/chatRouter");
 app.use("/", chatRouter);
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error("Unhandled Error Stack:", err.stack);
+  res.status(500).json({
+    status: "error",
+    message: "Internal Server Error",
+    details: err.message
+  });
+});
 
 const Chat = require("./Models/chatSchema");
 
