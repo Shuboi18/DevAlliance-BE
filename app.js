@@ -12,7 +12,8 @@ const { userAuth } = require("./userAuth");
 const userRouter = require("./Routers/userRouter");
 const profileRouter = require("./Routers/profileRouter");
 const connectRouter = require("./Routers/connectRouter");
-app.use(cp());
+
+// --- CORS CONFIGURATION START ---
 const isOriginAllowed = (origin) => {
   const allowedOrigins = [
     "http://localhost:3000",
@@ -43,17 +44,19 @@ const corsOptions = {
     if (isOriginAllowed(origin)) {
       callback(null, true);
     } else {
-      console.log("Blocked CORS Origin:", origin);
-      callback(new Error("Not allowed by CORS"));
+      console.error(`Blocked CORS Origin: ${origin}`);
+      // Using null, false prevents the 500 error and just fails the CORS check
+      callback(null, false);
     }
   },
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
 };
 
 app.use(cors(corsOptions));
-
-// Explicitly handle preflight using the SAME options
 app.options("*", cors(corsOptions));
+// --- CORS CONFIGURATION END ---
 
+app.use(cp());
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 
