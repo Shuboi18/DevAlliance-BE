@@ -13,6 +13,13 @@ const userRouter = require("./Routers/userRouter");
 const profileRouter = require("./Routers/profileRouter");
 const connectRouter = require("./Routers/connectRouter");
 
+// --- REQUEST LOGGER ---
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  console.log("Origin:", req.headers.origin);
+  next();
+});
+
 // --- CORS CONFIGURATION START ---
 // Use standard cors package with origin: true (reflects request origin)
 const corsOptions = {
