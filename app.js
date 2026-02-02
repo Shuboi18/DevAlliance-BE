@@ -17,23 +17,24 @@ app.use(
   cors({
     credentials: true,
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
-      // Allow any localhost/127.0.0.1 and any local network IP
-      if (
-        origin.startsWith("http://localhost") ||
-        origin.startsWith("http://127.0.0.1") ||
-        origin.startsWith("http://192.168.") ||
-        origin.startsWith("http://10.") ||
-        origin.startsWith("http://172.") ||
-        origin.startsWith("http://3.106.248.229/")
-      ) {
+
+      const allowedOrigins = [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://3.106.248.229",
+      ];
+
+      if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
+
       callback(new Error("Not allowed by CORS"));
     },
   }),
 );
+
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 
