@@ -29,6 +29,8 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "device-remember-token", "Access-Control-Allow-Origin", "Origin", "Accept"],
 };
 
+console.log("--- SERVER STARTING ---");
+console.log("CORS ALLOWED ORIGINS:", corsOptions.origin);
 app.use(cors(corsOptions));
 // --- CORS CONFIGURATION END ---
 
