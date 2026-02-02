@@ -37,22 +37,22 @@ const isOriginAllowed = (origin) => {
   );
 };
 
-app.use(
-  cors({
-    credentials: true,
-    origin: (origin, callback) => {
-      if (isOriginAllowed(origin)) {
-        callback(null, true);
-      } else {
-        console.log("Blocked CORS Origin:", origin);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-  })
-);
+const corsOptions = {
+  credentials: true,
+  origin: (origin, callback) => {
+    if (isOriginAllowed(origin)) {
+      callback(null, true);
+    } else {
+      console.log("Blocked CORS Origin:", origin);
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+};
 
-// Explicitly handle preflight
-app.options("*", cors());
+app.use(cors(corsOptions));
+
+// Explicitly handle preflight using the SAME options
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
