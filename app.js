@@ -13,22 +13,27 @@ const userRouter = require("./Routers/userRouter");
 const profileRouter = require("./Routers/profileRouter");
 const connectRouter = require("./Routers/connectRouter");
 app.use(cp());
-app.use(cors({
-  credentials: true,
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    // Allow any localhost/127.0.0.1 and any local network IP
-    if (origin.startsWith('http://localhost') ||
-      origin.startsWith('http://127.0.0.1') ||
-      origin.startsWith('http://192.168.') ||
-      origin.startsWith('http://10.') ||
-      origin.startsWith('http://172.')) {
-      return callback(null, true);
-    }
-    callback(new Error('Not allowed by CORS'));
-  }
-}));
+app.use(
+  cors({
+    credentials: true,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      // Allow any localhost/127.0.0.1 and any local network IP
+      if (
+        origin.startsWith("http://localhost") ||
+        origin.startsWith("http://127.0.0.1") ||
+        origin.startsWith("http://192.168.") ||
+        origin.startsWith("http://10.") ||
+        origin.startsWith("http://172.") ||
+        origin.startsWith("http://3.106.248.229/")
+      ) {
+        return callback(null, true);
+      }
+      callback(new Error("Not allowed by CORS"));
+    },
+  }),
+);
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 
@@ -42,16 +47,18 @@ const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
   cors: {
     origin: (origin, callback) => {
-      const allowed = !origin ||
-        origin.startsWith('http://localhost') ||
-        origin.startsWith('http://127.0.0.1') ||
-        origin.startsWith('http://192.168.') ||
-        origin.startsWith('http://10.') ||
-        origin.startsWith('http://172.');
+      const allowed =
+        !origin ||
+        origin.startsWith("http://localhost") ||
+        origin.startsWith("http://127.0.0.1") ||
+        origin.startsWith("http://192.168.") ||
+        origin.startsWith("http://10.") ||
+        origin.startsWith("http://172.") ||
+        origin.startsWith("http://3.106.248.229/");
       if (allowed) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,
