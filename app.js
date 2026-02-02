@@ -13,25 +13,38 @@ const userRouter = require("./Routers/userRouter");
 const profileRouter = require("./Routers/profileRouter");
 const connectRouter = require("./Routers/connectRouter");
 
-// --- CORS CONFIGURATION START ---
-// Simplify to allow dynamic origins with credentials
-const corsOptions = {
-  origin: true, // Reflects the request origin, allowing all origins dynamically
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-};
+// --- MANUALLY REFLECT CORS HEADERS TO ALLOW ALL HOSTS ---
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
 
-app.use(cors(corsOptions));
+  // Dynamically set the Access-Control-Allow-Origin header to the request's Origin
+  if (origin) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  } else {
+    // For non-browser requests (Postman, etc), generally safe to allow
+    res.setHeader("Access-Control-Allow-Origin", "*");
+  }
+
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, device-remember-token, Access-Control-Allow-Origin");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+
+  // Respond OK to preflight OPTIONS requests immediately
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
+
 const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
   cors: {
-    origin: true, // Allow all origins for Socket.io as well
+    origin: true, // Socket.io handles this internally to allow all
     credentials: true,
   },
 });
-
-app.options("*", cors(corsOptions));
-// --- CORS CONFIGURATION END ---
+// --- END CORS CONFIGURATION ---
 
 app.use(cp());
 app.use(express.json());
