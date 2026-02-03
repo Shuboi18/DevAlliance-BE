@@ -17,7 +17,7 @@ profileRouter.get("/profile/getProfile", userAuth, async (req, res) => {
 
 profileRouter.patch("/profile/editProfile", userAuth, upload.single("photo"), async (req, res) => {
   const user = req.user;
-  const { fname, lname, gender, bio, skills } = req.body;
+  const { fname, lname, gender, bio, skills, developerType } = req.body;
 
   const updateFields = {
     fname,
@@ -25,6 +25,7 @@ profileRouter.patch("/profile/editProfile", userAuth, upload.single("photo"), as
     gender,
     bio,
     skills,
+    developerType,
   };
 
   if (req.file) {

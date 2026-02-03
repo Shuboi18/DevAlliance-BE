@@ -40,6 +40,12 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  developerType: {
+    type: String,
+    // required: true, // Making it optional for now to avoid issues with existing users, or handle it in application logic
+    required: true,
+    default: "Developer"
+  },
   password: {
     type: String,
     required: true,
