@@ -10,7 +10,7 @@ const requestedFields = "fname lname age gender bio skills photoURL";
 userRouter.post("/user/signup", upload.single("photo"), async (req, res) => {
   // Signup logic will go here
   try {
-    const { fname, lname, email, age, gender, bio, skills, password } =
+    const { fname, lname, email, age, gender, bio, skills, password, developerType } =
       req.body;
 
     let photoURL = "https://geographyandyou.com/images/user-profile.png"; // Default image
@@ -26,6 +26,7 @@ userRouter.post("/user/signup", upload.single("photo"), async (req, res) => {
       email: lowercaseEmail,
       age,
       gender,
+      developerType,
       bio,
       skills,
       photoURL,
