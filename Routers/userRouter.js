@@ -19,10 +19,11 @@ userRouter.post("/user/signup", upload.single("photo"), async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const lowercaseEmail = email.toLowerCase();
     const user = new User({
       fname,
       lname,
-      email,
+      email: lowercaseEmail,
       age,
       gender,
       bio,
@@ -41,7 +42,9 @@ userRouter.post("/user/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email: email });
+    const lowercaseEmail = email.toLowerCase();
+
+    const user = await User.findOne({ email: lowercaseEmail });
     if (!user) {
       return res.status(400).send("User not found");
     }
@@ -72,7 +75,10 @@ userRouter.post("/user/logout", async (req, res) => {
 userRouter.post("/user/forgotPassword", async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await User.findOne({ email });
+
+    const lowercaseEmail = email.toLowerCase();
+
+    const user = await User.findOne({ email: lowercaseEmail });
 
     if (!user) {
       return res.status(404).send("User not found");
@@ -87,7 +93,7 @@ userRouter.post("/user/forgotPassword", async (req, res) => {
     // For now, logging to console.
 
     console.log("---------------------------------------------------");
-    console.log(`PASSWORD RESET OTP for ${email}:`);
+    console.log(`PASSWORD RESET OTP for ${lowercaseEmail}:`);
     console.log(`OTP: ${otp}`);
     console.log("---------------------------------------------------");
 
@@ -118,8 +124,10 @@ userRouter.post("/user/resetPassword", async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body;
 
+    const lowercaseEmail = email.toLowerCase();
+
     const user = await User.findOne({
-      email: email,
+      email: lowercaseEmail,
       resetPasswordToken: otp,
       resetPasswordExpires: { $gt: Date.now() },
     });
