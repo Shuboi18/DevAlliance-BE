@@ -95,36 +95,11 @@ io.on("connection", (socket) => {
     console.log(`User ${userId} joined room ${roomId}`);
   });
 
-  // Track online users for direct calling
+  // Track online users
   socket.on("addNewUser", (userId) => {
     onlineUsers.set(userId, socket.id);
     console.log("Online users:", Array.from(onlineUsers.keys()));
     io.emit("getOnlineUsers", Array.from(onlineUsers.keys()));
-  });
-
-  // Call Events
-  socket.on("callUser", ({ userToCall, signalData, from, name }) => {
-    const socketId = onlineUsers.get(userToCall);
-    if (socketId) {
-      io.to(socketId).emit("callUser", { signal: signalData, from, name });
-    }
-  });
-
-  socket.on("answerCall", (data) => {
-    const socketId = onlineUsers.get(data.to);
-    if (socketId) {
-      io.to(socketId).emit("callAccepted", data.signal);
-    }
-  });
-
-  // Handle ICE candidates for stability (optional but recommended for simple-peer if strictly needed, mostly handled by signal data)
-  // simple-peer wraps ice candidates in the signal data usually.
-
-  socket.on("endCall", ({ to }) => {
-    const socketId = onlineUsers.get(to);
-    if (socketId) {
-      io.to(socketId).emit("callEnded");
-    }
   });
 
   socket.on("send_message", async ({ senderId, receiverId, message }) => {
@@ -149,6 +124,16 @@ io.on("connection", (socket) => {
       }
     }
   });
+});
+
+// Serve Frontend Static Files
+const path = require("path");
+app.use(express.static(path.join(__dirname, "../Frontend/dist")));
+
+// Handle SPA 404 (Wildcard Route) - Must be after all API routes
+// Handle SPA 404 (Wildcard Route) - Must be after all API routes
+app.get(/(.*)/, (req, res) => {
+  res.sendFile(path.join(__dirname, "../Frontend/dist", "index.html"));
 });
 
 connectDB()
