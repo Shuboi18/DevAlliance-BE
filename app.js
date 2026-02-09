@@ -45,7 +45,9 @@ app.use(cors(corsOptions));
 
 // Health Check Route
 app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok", message: "Server is running and CORS is active" });
+  res
+    .status(200)
+    .json({ status: "ok", message: "Server is running and CORS is active" });
 });
 
 const server = require("http").createServer(app);
@@ -72,7 +74,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({
     status: "error",
     message: "Internal Server Error",
-    details: err.message
+    details: err.message,
   });
 });
 
@@ -127,8 +129,14 @@ app.use(express.static(path.join(__dirname, "../Frontend/dist")));
 
 // Handle SPA 404 (Wildcard Route) - Must be after all API routes
 // Handle SPA 404 (Wildcard Route) - Must be after all API routes
-app.get(/(.*)/, (req, res) => {
-  res.sendFile(path.join(__dirname, "../Frontend/dist", "index.html"));
+// Handle SPA 404 (Wildcard Route) - Must be after all API routes
+app.use((req, res, next) => {
+  if (req.method === "GET") {
+    console.log(`Fallback for SPA: ${req.url}`);
+    res.sendFile(path.join(__dirname, "../Frontend/dist", "index.html"));
+  } else {
+    next();
+  }
 });
 
 connectDB()
@@ -141,7 +149,3 @@ connectDB()
   .catch((err) => {
     console.error("Database connection failed:", err);
   });
-
-
-
-
