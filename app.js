@@ -23,13 +23,7 @@ app.use((req, res, next) => {
 // --- CORS CONFIGURATION START ---
 // Use standard cors package with origin: true (reflects request origin)
 const corsOptions = {
-  origin: [
-    "http://3.106.248.229",
-    "http://3.106.248.229:3000",
-    "http://3.106.248.229:5173",
-    "http://localhost:5173",
-    "http://localhost:3000",
-  ],
+  origin: true,
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: [
