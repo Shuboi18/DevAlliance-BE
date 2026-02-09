@@ -15,12 +15,8 @@ userRouter.post("/user/signup", upload.single("photo"), async (req, res) => {
 
     let photoURL = "https://geographyandyou.com/images/user-profile.png"; // Default image
     if (req.file) {
-<<<<<<< HEAD
       const baseUrl = `${req.protocol}://${req.get("host")}`;
       photoURL = `${baseUrl}/uploads/profile/${req.file.filename}`;
-=======
-      photoURL = `http://3.106.248.229/uploads/profile/${req.file.filename}`;
->>>>>>> 506fa86e33ab582dc441883e39475c99390139fd
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
