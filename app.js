@@ -23,7 +23,13 @@ app.use((req, res, next) => {
 // --- CORS CONFIGURATION START ---
 // Use standard cors package with origin: true (reflects request origin)
 const corsOptions = {
-  origin: true,
+  origin: [
+    "http://3.106.248.229",
+    "http://3.106.248.229:3000",
+    "http://3.106.248.229:5173",
+    "http://localhost:5173",
+    "http://localhost:3000",
+  ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: [
@@ -44,7 +50,9 @@ app.use(cors(corsOptions));
 
 // Health Check Route
 app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok", message: "Server is running and CORS is active" });
+  res
+    .status(200)
+    .json({ status: "ok", message: "Server is running and CORS is active" });
 });
 
 const server = require("http").createServer(app);
@@ -71,7 +79,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({
     status: "error",
     message: "Internal Server Error",
-    details: err.message
+    details: err.message,
   });
 });
 
@@ -140,7 +148,3 @@ connectDB()
   .catch((err) => {
     console.error("Database connection failed:", err);
   });
-
-
-
-
