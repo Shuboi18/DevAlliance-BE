@@ -125,13 +125,22 @@ io.on("connection", (socket) => {
 
 // Serve Frontend Static Files
 const path = require("path");
-app.use(express.static(path.join(__dirname, "../Frontend/dist")));
+const frontendPath = path.join(__dirname, "../Frontend/dist");
+console.log("Serving Frontend from:", frontendPath);
+app.use(express.static(frontendPath));
 
 // Handle SPA 404 (Wildcard Route) - Must be after all API routes
 app.use((req, res, next) => {
   if (req.method === "GET") {
     console.log(`Fallback for SPA: ${req.url}`);
-    res.sendFile(path.join(__dirname, "../Frontend/dist", "index.html"));
+    res.sendFile(path.join(frontendPath, "index.html"), (err) => {
+      if (err) {
+        console.error("Error serving index.html:", err);
+        // If index.html is missing, it means the frontend isn't built or path is wrong.
+        // Send a clear 404/500 message to the client.
+        res.status(500).send("Server Error: Frontend build not found. Please run 'npm run build' in the Frontend directory.");
+      }
+    });
   } else {
     next();
   }
