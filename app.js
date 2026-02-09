@@ -136,8 +136,12 @@ app.use(express.static(path.join(__dirname, "../Frontend/dist")));
 // Handle SPA 404 (Wildcard Route) - Must be after all API routes
 // Handle SPA 404 (Wildcard Route) - Must be after all API routes
 app.use((req, res, next) => {
-  console.log(`Fallback for SPA: ${req.url}`);
-  res.sendFile(path.join(__dirname, "../Frontend/dist", "index.html"));
+  if (req.method === "GET") {
+    console.log(`Fallback for SPA: ${req.url}`);
+    res.sendFile(path.join(__dirname, "../Frontend/dist", "index.html"));
+  } else {
+    next();
+  }
 });
 
 connectDB()
