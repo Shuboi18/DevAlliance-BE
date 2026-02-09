@@ -29,7 +29,8 @@ profileRouter.patch("/profile/editProfile", userAuth, upload.single("photo"), as
   };
 
   if (req.file) {
-    updateFields.photoURL = `http://3.106.248.229:3000/uploads/profile/${req.file.filename}`;
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    updateFields.photoURL = `${baseUrl}/uploads/profile/${req.file.filename}`;
   }
 
   try {
