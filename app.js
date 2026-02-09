@@ -1,3 +1,5 @@
+// Final Back end for DevAlliance
+
 const express = require("express");
 if (process.env.NODE_ENV !== "PRODUCTION") {
   require("dotenv").config({ path: "config/config.env" });
@@ -130,20 +132,22 @@ const fs = require("fs");
 // Check for common frontend directory names
 const possibleFrontendPaths = [
   path.join(__dirname, "../Frontend/dist"),
-  path.join(__dirname, "../DevAlliance-FE/dist")
+  path.join(__dirname, "../DevAlliance-FE/dist"),
 ];
 
-let frontendPath = possibleFrontendPaths.find(p => fs.existsSync(p));
+let frontendPath = possibleFrontendPaths.find((p) => fs.existsSync(p));
 
 if (frontendPath) {
   console.log("Serving Frontend from:", frontendPath);
   app.use(express.static(frontendPath));
 } else {
-  console.error("CRITICAL: Frontend build not found. Checked:", possibleFrontendPaths);
+  console.error(
+    "CRITICAL: Frontend build not found. Checked:",
+    possibleFrontendPaths,
+  );
   // Fallback to standard path specifically to show the error in the browser if possible
   frontendPath = path.join(__dirname, "../Frontend/dist");
 }
-
 
 // Handle SPA 404 (Wildcard Route) - Must be after all API routes
 app.use((req, res, next) => {
@@ -154,7 +158,11 @@ app.use((req, res, next) => {
         console.error("Error serving index.html:", err);
         // If index.html is missing, it means the frontend isn't built or path is wrong.
         // Send a clear 404/500 message to the client.
-        res.status(500).send(`Server Error: Frontend build not found. Checked: ${possibleFrontendPaths.map(p => path.basename(path.dirname(p))).join(', ')}. Please run 'npm run build' in the frontend directory.`);
+        res
+          .status(500)
+          .send(
+            `Server Error: Frontend build not found. Checked: ${possibleFrontendPaths.map((p) => path.basename(path.dirname(p))).join(", ")}. Please run 'npm run build' in the frontend directory.`,
+          );
       }
     });
   } else {
